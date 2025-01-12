@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cs-user-service
+  labels:
+    app: cs-user-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cs-user-service
+  template:
+    metadata:
+      name: cs-user-service
+      labels:
+        app: cs-user-service
+    spec:
+      containers:
+        - name: cs-user-service
+          image: vadimkirpikov/cs-user-service:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Development"
+      restartPolicy: Always
+      

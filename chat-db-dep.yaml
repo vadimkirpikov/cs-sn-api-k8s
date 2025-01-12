@@ -1,0 +1,32 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-db
+  labels:
+    app: chat-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-db
+  template:
+    metadata:
+      name: chat-db
+      labels:
+        app: chat-db
+    spec:
+      containers:
+        - name: chat-db
+          image: postgres:17.2
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          env:
+            - name: POSTGRES_USER
+              value: "admin"
+            - name: POSTGRES_DB
+              value: "chat-db"
+            - name: POSTGRES_PASSWORD
+              value: "123"
+      restartPolicy: Always
+      

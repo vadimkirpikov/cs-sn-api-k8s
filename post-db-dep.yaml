@@ -1,0 +1,32 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: post-db
+  labels:
+    app: post-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: post-db
+  template:
+    metadata:
+      name: post-db
+      labels:
+        app: post-db
+    spec:
+      containers:
+        - name: post-db
+          image: postgres:17.2
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          env:
+            - name: POSTGRES_USER
+              value: "admin"
+            - name: POSTGRES_DB
+              value: "post-db"
+            - name: POSTGRES_PASSWORD
+              value: "123"
+      restartPolicy: Always
+      

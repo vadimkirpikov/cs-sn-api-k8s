@@ -1,0 +1,114 @@
+﻿apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  nginx.conf: |
+    events {
+        worker_connections 1024;
+    }
+
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+
+        access_log /var/log/nginx/access.log;
+        error_log /var/log/nginx/error.log;
+        
+        client_max_body_size 10M;
+
+        upstream chats_service {
+            server cs-chat-service:8080;
+        }
+
+        upstream notifications_service {
+            server cs-notification-service:8080;
+        }
+
+        upstream posts_service {
+            server cs-post-service:8080;
+        }
+
+        upstream users_service {
+            server cs-user-service:8080;
+        }
+
+        # Общие proxy_set_header
+        map $http_authorization $auth_header {
+            default $http_authorization;
+        }
+
+        server {
+            listen 80;
+
+            set $proxy_headers 'proxy_set_header Authorization $auth_header;
+                                 proxy_set_header Host $host;
+                                 proxy_set_header X-Real-IP $remote_addr;
+                                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                                 proxy_set_header X-Forwarded-Proto $scheme;';
+
+            location /api/v1/chats {
+                proxy_pass http://chats_service;
+                $proxy_headers;
+            }
+
+            location /api/v1/messages {
+                proxy_pass http://chats_service;
+                $proxy_headers;
+            }
+
+            location /api/v1/notifications {
+                proxy_pass http://notifications_service;
+                $proxy_headers;
+            }
+
+            location /api/v1/posts {
+                proxy_pass http://posts_service;
+                $proxy_headers;
+            }
+
+            location = /api/v1/users/register {
+                proxy_pass http://users_service;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+
+            location = /api/v1/users/login {
+                proxy_pass http://users_service;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+
+            location /api/v1/users {
+                proxy_pass http://users_service;
+                $proxy_headers;
+            }
+
+            location /api/v1/subscriptions {
+                proxy_pass http://users_service;
+                $proxy_headers;
+            }
+
+            location /chat {
+                proxy_pass http://cs-chat-service:8080;
+                proxy_http_version 1.1;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection 'upgrade';
+                proxy_redirect off;
+            }
+
+            location /status {
+                stub_status;
+                allow all;
+                allow 127.0.0.1;
+            }
+        }
+    }

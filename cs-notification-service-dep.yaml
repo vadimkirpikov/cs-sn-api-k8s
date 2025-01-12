@@ -1,0 +1,28 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cs-notification-service
+  labels:
+    app: cs-notification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cs-notification-service
+  template:
+    metadata:
+      name: cs-notification-service
+      labels:
+        app: cs-notification-service
+    spec:
+      containers:
+        - name: cs-notification-service
+          image: vadimkirpikov/cs-notification-service
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Development"
+      restartPolicy: Always
+      
