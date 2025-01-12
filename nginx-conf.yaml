@@ -33,38 +33,56 @@ data:
             server cs-user-service:8080;
         }
 
-        # Общие proxy_set_header
-        map $http_authorization $auth_header {
-            default $http_authorization;
-        }
-
         server {
             listen 80;
-
-            set $proxy_headers 'proxy_set_header Authorization $auth_header;
-                                 proxy_set_header Host $host;
-                                 proxy_set_header X-Real-IP $remote_addr;
-                                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                                 proxy_set_header X-Forwarded-Proto $scheme;';
+            
+            location /user-service/swagger {
+                proxy_pass http://users_service/swagger/index.html;
+            }
+            location /post-service/swagger {
+                proxy_pass http://posts_service/swagger/index.html;
+            }
+            location /chat-service/swagger {
+                proxy_pass http://chats_service/swagger/index.html;
+            }
+            location /notification-service/swagger {
+                proxy_pass http://notifications_service/swagger/index.html;
+            }
 
             location /api/v1/chats {
                 proxy_pass http://chats_service;
-                $proxy_headers;
+                proxy_set_header Authorization $http_authorization;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
             }
 
             location /api/v1/messages {
                 proxy_pass http://chats_service;
-                $proxy_headers;
+                proxy_set_header Authorization $http_authorization;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
             }
 
             location /api/v1/notifications {
                 proxy_pass http://notifications_service;
-                $proxy_headers;
+                proxy_set_header Authorization $http_authorization;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
             }
 
             location /api/v1/posts {
                 proxy_pass http://posts_service;
-                $proxy_headers;
+                proxy_set_header Authorization $http_authorization;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
             }
 
             location = /api/v1/users/register {
@@ -85,12 +103,20 @@ data:
 
             location /api/v1/users {
                 proxy_pass http://users_service;
-                $proxy_headers;
+                proxy_set_header Authorization $http_authorization;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
             }
 
             location /api/v1/subscriptions {
                 proxy_pass http://users_service;
-                $proxy_headers;
+                proxy_set_header Authorization $http_authorization;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
             }
 
             location /chat {
